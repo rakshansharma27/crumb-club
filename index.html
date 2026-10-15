@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8e8">
+  <meta name="description" content="Crumb Club helps campus neighbours rescue good food before closing time.">
+  <title>Crumb Club — little food rescues</title>
+  <style>
+    :root {
+      --ink: #243337;
+      --muted: #687778;
+      --cream: #fff8e8;
+      --paper: #fffdf7;
+      --pink: #ff8eac;
+      --pink-dark: #d94d78;
+      --yellow: #ffd85e;
+      --blue: #b9edf0;
+      --green: #a4e4bd;
+      --orange: #ffad70;
+      --line: #e6ddc6;
+      --shadow: 0 12px 30px rgba(73, 61, 31, .09);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 15%, rgba(255, 216, 94, .15) 0 3px, transparent 4px),
+        radial-gradient(circle at 92% 30%, rgba(255, 142, 172, .13) 0 4px, transparent 5px),
+        var(--cream);
+      background-size: 54px 54px, 68px 68px, auto;
+      font-family: "Trebuchet MS", "Avenir Next", system-ui, sans-serif;
+      line-height: 1.5;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #347c80;
+      outline-offset: 3px;
+    }
+    [hidden] { display: none !important; }
+    .shell { width: min(1120px, calc(100% - 36px)); margin: 0 auto; }
+    .topbar {
+      min-height: 82px; display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; border-bottom: 1px dashed rgba(85, 82, 58, .23);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+    .brand-mark {
+      width: 46px; height: 46px; display: grid; place-items: center; border-radius: 16px 13px 17px 12px;
+      background: var(--yellow); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+      font-size: 25px; transform: rotate(-4deg);
+    }
+    .brand-name { font-size: 20px; line-height: 1; font-weight: 1000; letter-spacing: -.7px; }
+    .brand-name small { display: block; margin-top: 5px; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); }
+    .nav { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+    .nav-button {
+      border: 0; background: transparent; border-radius: 999px; padding: 10px 14px; font-weight: 800;
+      color: #58696a; transition: background .18s, transform .18s;
+    }
+    .nav-button:hover { background: rgba(255,255,255,.75); transform: translateY(-1px); }
+    .nav-button.active { color: var(--ink); background: var(--paper); box-shadow: 0 3px 0 rgba(36,51,55,.1); }
+    .nav-count { display: inline-grid; place-items: center; min-width: 19px; height: 19px; margin-left: 3px; padding: 0 5px; border-radius: 99px; background: var(--pink); color: #fff; font-size: 11px; }
+    .reset-button { border: 1px dashed #a69c80; background: transparent; padding: 9px 12px; border-radius: 999px; color: #68716a; font-size: 12px; font-weight: 800; }
+    .reset-button:hover { background: #fff; }
+    .hero {
+      position: relative; display: grid; grid-template-columns: 1.08fr .92fr; gap: 30px; align-items: center;
+      margin: 28px 0 20px; padding: clamp(26px, 5vw, 55px); min-height: 356px; overflow: hidden;
+      border: 2px solid var(--ink); border-radius: 34px 28px 34px 29px; background: var(--pink);
+      box-shadow: 7px 7px 0 var(--ink);
+    }
+    .hero:before, .hero:after { content: ""; position: absolute; border: 2px solid rgba(36,51,55,.12); border-radius: 50%; pointer-events: none; }
+    .hero:before { width: 250px; height: 250px; right: 26%; top: -180px; }
+    .hero:after { width: 340px; height: 340px; right: -150px; bottom: -250px; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; width: fit-content; margin: 0 0 15px; padding: 6px 11px; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--yellow); font-size: 11px; font-weight: 1000; letter-spacing: 1.1px; text-transform: uppercase; }
+    .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: #27946d; box-shadow: 0 0 0 3px rgba(39,148,109,.17); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 640px; margin-bottom: 13px; font-size: clamp(38px, 5.5vw, 68px); line-height: .98; letter-spacing: -3.5px; }
+    h1 em { color: #fff9e9; font-style: normal; text-decoration: underline; text-decoration-color: var(--ink); text-decoration-thickness: 3px; text-underline-offset: 5px; }
+    .hero-copy > p:not(.eyebrow) { max-width: 510px; margin-bottom: 22px; color: #553d45; font-size: 17px; }
+    .primary-button, .secondary-button, .soft-button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 12px 18px;
+      border: 2px solid var(--ink); border-radius: 15px 13px 16px 12px; background: var(--yellow); box-shadow: 3px 3px 0 var(--ink);
+      color: var(--ink); font-weight: 1000; text-decoration: none; transition: transform .15s, box-shadow .15s;
+    }
+    .primary-button:hover, .secondary-button:hover, .soft-button:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .secondary-button { background: var(--blue); }
+    .soft-button { min-height: 39px; padding: 8px 12px; border-width: 1.5px; border-radius: 12px; background: #fff; box-shadow: 2px 2px 0 var(--ink); font-size: 13px; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 17px; }
+    .hero-tags span { padding: 5px 10px; border: 1px dashed rgba(36,51,55,.52); border-radius: 999px; color: #563e45; font-size: 12px; font-weight: 800; }
+    .hero-art { position: relative; min-height: 250px; display: grid; place-items: center; }
+    .sunburst {
+      position: absolute; width: 220px; height: 220px; border-radius: 50%;
+      background: repeating-conic-gradient(from 4deg, var(--yellow) 0 10deg, transparent 10deg 20deg);
+      opacity: .85; animation: slow-spin 48s linear infinite;
+    }
+    .plate {
+      position: relative; display: grid; place-items: center; width: 212px; height: 212px; border: 3px solid var(--ink);
+      border-radius: 50%; background: #fffdf6; box-shadow: 7px 7px 0 var(--ink); transform: rotate(7deg);
+    }
+    .plate:before { content: ""; position: absolute; inset: 17px; border: 2px dashed #e9d8ad; border-radius: 50%; }
+    .plate-food { position: relative; z-index: 1; font-size: 91px; filter: drop-shadow(3px 5px 0 rgba(36,51,55,.14)); }
+    .sticker {
+      position: absolute; z-index: 2; right: -14px; top: 13px; display: grid; place-items: center; width: 89px; height: 89px;
+      border: 2px solid var(--ink); border-radius: 47% 53% 48% 52%; background: var(--blue); box-shadow: 3px 3px 0 var(--ink);
+      text-align: center; font-size: 12px; line-height: 1.05; font-weight: 1000; transform: rotate(9deg);
+    }
+    .sticker strong { display: block; font-size: 21px; }
+    .tiny-star { position: absolute; color: var(--yellow); font-size: 35px; text-shadow: 2px 2px var(--ink); }
+    .star-one { top: 2px; left: 12%; transform: rotate(-16deg); }
+    .star-two { bottom: 9px; right: 10%; font-size: 25px; transform: rotate(14deg); }
+    .stats-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 27px 0 42px; }
+    .stat { display: flex; align-items: center; gap: 11px; min-height: 72px; padding: 14px 17px; border: 1.5px solid var(--ink); border-radius: 18px; background: var(--paper); box-shadow: 3px 3px 0 rgba(36,51,55,.13); }
+    .stat-icon { display: grid; place-items: center; width: 39px; height: 39px; flex: 0 0 auto; border-radius: 13px; background: var(--blue); font-size: 20px; }
+    .stat:nth-child(2) .stat-icon { background: var(--yellow); }
+    .stat:nth-child(3) .stat-icon { background: var(--green); }
+    .stat strong { display: block; font-size: 19px; line-height: 1.1; }
+    .stat small { display: block; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 17px; }
+    .section-kicker { margin: 0 0 5px; color: var(--pink-dark); font-size: 11px; font-weight: 1000; letter-spacing: 1.2px; text-transform: uppercase; }
+    h2 { margin-bottom: 0; font-size: clamp(27px, 3.6vw, 39px); line-height: 1.1; letter-spacing: -1.5px; }
+    .section-note { margin: 0; color: var(--muted); font-size: 13px; font-weight: 800; }
+    .controls { display: flex; align-items: center; gap: 10px; margin: 20px 0 18px; }
+    .search-wrap { position: relative; flex: 1; min-width: 180px; }
+    .search-wrap span { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); }
+    .search-input, .select-input, .field-input, .field-select, .field-textarea {
+      width: 100%; min-height: 46px; border: 1.5px solid #c8bea5; border-radius: 14px; background: var(--paper); color: var(--ink); padding: 11px 13px;
+    }
+    .search-input { padding-left: 42px; }
+    .select-input { width: auto; min-width: 160px; }
+    .drop-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 17px; margin: 0 0 45px; }
+    .drop-card { overflow: hidden; border: 1.5px solid var(--ink); border-radius: 23px 19px 24px 20px; background: var(--paper); box-shadow: 4px 4px 0 rgba(36,51,55,.18); transition: transform .18s, box-shadow .18s; }
+    .drop-card:hover { transform: translateY(-4px) rotate(-.4deg); box-shadow: 7px 8px 0 rgba(36,51,55,.15); }
+    .card-banner { position: relative; display: grid; place-items: center; height: 150px; overflow: hidden; }
+    .card-banner:before { content: ""; position: absolute; width: 174px; height: 174px; border: 1.5px dashed rgba(36,51,55,.23); border-radius: 50%; }
+    .tone-pink { background: #ffcfdb; }
+    .tone-yellow { background: #ffe89c; }
+    .tone-blue { background: #c9f1ef; }
+    .tone-green { background: #ccebd1; }
+    .tone-orange { background: #ffd1a5; }
+    .food-emoji { position: relative; z-index: 1; font-size: 72px; filter: drop-shadow(2px 5px 0 rgba(36,51,55,.13)); }
+    .save-tag { position: absolute; z-index: 2; top: 12px; right: 12px; padding: 6px 10px; border: 1.5px solid var(--ink); border-radius: 999px; background: #fffdf6; font-size: 10px; font-weight: 1000; letter-spacing: .4px; text-transform: uppercase; }
+    .card-body { padding: 16px; }
+    .vendor-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; color: var(--muted); font-size: 11px; font-weight: 900; }
+    .portion-left { color: var(--pink-dark); }
+    .drop-card h3 { margin: 0 0 7px; font-size: 20px; line-height: 1.18; letter-spacing: -.5px; }
+    .drop-description { min-height: 39px; margin-bottom: 12px; color: #596767; font-size: 13px; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; min-height: 27px; margin-bottom: 12px; }
+    .chip { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; background: #edf6e9; color: #3e684c; font-size: 10px; font-weight: 900; }
+    .chip.price-chip { background: #fff0bd; color: #584718; }
+    .card-meta { display: grid; gap: 6px; margin: 12px 0; padding: 11px 0; border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); color: #566665; font-size: 12px; font-weight: 800; }
+    .card-meta span { display: flex; align-items: start; gap: 7px; }
+    .card-action { width: 100%; min-height: 43px; padding: 10px 12px; border: 1.5px solid var(--ink); border-radius: 13px; background: var(--yellow); box-shadow: 2px 2px 0 var(--ink); font-weight: 1000; }
+    .card-action:hover { background: #ffe47f; }
+    .empty-state { grid-column: 1/-1; padding: 45px 24px; border: 1.5px dashed #b5aa8e; border-radius: 22px; background: rgba(255,253,247,.7); text-align: center; }
+    .empty-state .empty-emoji { display: block; margin-bottom: 8px; font-size: 44px; }
+    .empty-state h3 { margin-bottom: 5px; }
+    .empty-state p { margin-bottom: 0; color: var(--muted); }
+    .subpage { min-height: 60vh; padding: 34px 0 48px; }
+    .subpage-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 22px; }
+    .subpage-head p:last-child { max-width: 390px; margin-bottom: 2px; color: var(--muted); font-size: 14px; }
+    .pickup-list { display: grid; gap: 13px; }
+    .pickup-card { display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 15px; padding: 15px; border: 1.5px solid var(--ink); border-radius: 19px; background: var(--paper); box-shadow: 3px 3px 0 rgba(36,51,55,.13); }
+    .pickup-icon { display: grid; place-items: center; width: 68px; height: 68px; border-radius: 18px; background: var(--yellow); font-size: 36px; }
+    .pickup-card h3 { margin: 0 0 5px; font-size: 18px; }
+    .pickup-card p { margin: 0; color: var(--muted); font-size: 12px; }
+    .pickup-code { display: inline-block; margin-top: 8px; padding: 4px 9px; border: 1px dashed #968b70; border-radius: 8px; background: #fff7dc; font-family: ui-monospace, monospace; font-size: 16px; font-weight: 1000; letter-spacing: 2px; }
+    .status-pill { display: inline-flex; align-items: center; gap: 5px; width: fit-content; padding: 5px 9px; border-radius: 999px; background: #e6f7eb; color: #2d7547; font-size: 10px; font-weight: 1000; text-transform: uppercase; }
+    .status-pill.collected { background: #d9f0f2; color: #26656b; }
+    .status-pill.expired, .status-pill.cancelled { background: #f5e8df; color: #856250; }
+    .status-pill.scheduled { background: #fff0bd; color: #755d18; }
+    .partner-layout { display: grid; grid-template-columns: minmax(280px,.86fr) minmax(0,1.14fr); gap: 19px; align-items: start; }
+    .panel { padding: 20px; border: 1.5px solid var(--ink); border-radius: 23px; background: var(--paper); box-shadow: 4px 4px 0 rgba(36,51,55,.15); }
+    .panel h3 { margin-bottom: 6px; font-size: 21px; letter-spacing: -.6px; }
+    .panel-intro { margin-bottom: 17px; color: var(--muted); font-size: 13px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 5px; }
+    .field.full { grid-column: 1/-1; }
+    .field label { color: #455556; font-size: 11px; font-weight: 1000; }
+    .field-input, .field-select, .field-textarea { min-height: 42px; border-radius: 11px; padding: 9px 11px; font-size: 13px; }
+    .field-textarea { min-height: 72px; resize: vertical; }
+    .field-help { margin: -1px 0 0; color: #7b8074; font-size: 10px; }
+    .drop-submit { width: 100%; margin-top: 14px; }
+    .partner-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; margin: 0 0 14px; }
+    .mini-stat { padding: 11px; border: 1px dashed #b9ae91; border-radius: 14px; background: #fff9e8; }
+    .mini-stat strong { display: block; font-size: 20px; }
+    .mini-stat small { display: block; color: var(--muted); font-size: 9px; font-weight: 900; text-transform: uppercase; }
+    .partner-list { display: grid; gap: 12px; }
+    .partner-drop { padding: 14px; border: 1px solid #d8d0bd; border-radius: 16px; background: #fffef9; }
+    .partner-drop-head { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+    .partner-drop h4 { margin: 0 0 3px; font-size: 15px; }
+    .partner-drop p { margin: 0 0 9px; color: var(--muted); font-size: 11px; }
+    .partner-drop .drop-count { padding: 4px 7px; border-radius: 999px; background: #e9f7ec; color: #387348; font-size: 10px; font-weight: 1000; white-space: nowrap; }
+    .claim-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 10px; margin-top: 9px; border-top: 1px dashed var(--line); }
+    .claim-row .claim-person { flex: 1; min-width: 100px; font-size: 12px; font-weight: 900; }
+    .verify-form { display: flex; gap: 6px; }
+    .verify-input { width: 88px; min-height: 36px; border: 1px solid #bfb59e; border-radius: 9px; padding: 6px 8px; font-family: ui-monospace, monospace; letter-spacing: 2px; text-align: center; }
+    .verify-button { min-height: 36px; padding: 6px 9px; border: 1px solid var(--ink); border-radius: 9px; background: var(--blue); font-size: 11px; font-weight: 1000; }
+    .dialog { width: min(500px, calc(100% - 28px)); padding: 0; border: 2px solid var(--ink); border-radius: 24px; background: var(--paper); box-shadow: 8px 8px 0 var(--ink); color: var(--ink); }
+    .dialog::backdrop { background: rgba(29,39,40,.55); backdrop-filter: blur(3px); }
+    .dialog-inner { padding: 25px; }
+    .dialog-top { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+    .dialog-food { display: grid; place-items: center; width: 66px; height: 66px; margin-bottom: 14px; border-radius: 19px; background: #ffe89c; font-size: 39px; }
+    .dialog h2 { margin: 0 0 8px; font-size: 28px; }
+    .dialog-description { color: var(--muted); font-size: 14px; }
+    .dialog-info { display: grid; gap: 7px; margin: 15px 0; padding: 14px; border-radius: 15px; background: #fff7df; font-size: 13px; font-weight: 800; }
+    .close-dialog { display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid #d6cbb2; border-radius: 50%; background: #fff; font-size: 20px; }
+    .reserve-row { display: flex; align-items: end; gap: 10px; margin-top: 12px; }
+    .reserve-row .field { flex: 1; }
+    .reserve-row input { width: 100%; }
+    .dialog-note { margin: 11px 0 0; color: var(--muted); font-size: 11px; }
+    .toast { position: fixed; z-index: 20; right: 20px; bottom: 20px; max-width: min(380px,calc(100% - 40px)); padding: 13px 17px; border: 1.5px solid var(--ink); border-radius: 14px; background: var(--ink); color: white; box-shadow: 4px 4px 0 var(--yellow); font-size: 13px; font-weight: 900; opacity: 0; transform: translateY(15px); pointer-events: none; transition: opacity .2s, transform .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .footer { display: flex; justify-content: space-between; gap: 15px; padding: 22px 0 30px; border-top: 1px dashed rgba(85,82,58,.23); color: var(--muted); font-size: 11px; }
+    .footer strong { color: var(--ink); }
+    .helper-note { margin: 14px 0 22px; padding: 13px 15px; border-left: 4px solid #4e9e86; border-radius: 0 12px 12px 0; background: #e9f6e8; color: #466253; font-size: 12px; }
+    @keyframes slow-spin { to { transform: rotate(360deg); } }
+    @media (max-width: 850px) {
+      .hero { grid-template-columns: 1fr .72fr; padding: 33px; }
+      .hero-art { min-height: 210px; }
+      .plate { width: 175px; height: 175px; }
+      .sunburst { width: 185px; height: 185px; }
+      .plate-food { font-size: 72px; }
+      .sticker { width: 75px; height: 75px; font-size: 10px; }
+      .sticker strong { font-size: 18px; }
+      .drop-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .partner-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 24px, 500px); }
+      .topbar { align-items: start; flex-direction: column; gap: 11px; padding: 15px 0 12px; }
+      .nav { width: 100%; justify-content: start; gap: 4px; }
+      .nav-button { padding: 8px 10px; font-size: 12px; }
+      .reset-button { margin-left: auto; }
+      .hero { grid-template-columns: 1fr; gap: 5px; margin-top: 19px; padding: 25px 23px 14px; border-radius: 27px; }
+      .hero-copy > p:not(.eyebrow) { font-size: 15px; }
+      h1 { font-size: clamp(42px,13vw,60px); letter-spacing: -2.8px; }
+      .hero-art { min-height: 195px; }
+      .plate { width: 155px; height: 155px; }
+      .sunburst { width: 165px; height: 165px; }
+      .plate-food { font-size: 64px; }
+      .sticker { right: 15%; top: 1px; }
+      .stats-strip { grid-template-columns: 1fr; gap: 8px; margin: 20px 0 34px; }
+      .stat { min-height: 60px; padding: 10px 13px; }
+      .stat-icon { width: 36px; height: 36px; }
+      .section-heading, .subpage-head { align-items: start; flex-direction: column; }
+      .section-note { margin-top: 4px; }
+      .controls { align-items: stretch; flex-direction: column; }
+      .select-input { width: 100%; }
+      .drop-grid { grid-template-columns: 1fr; gap: 14px; }
+      .card-banner { height: 138px; }
+      .pickup-card { grid-template-columns: 58px 1fr; gap: 11px; padding: 12px; }
+      .pickup-icon { width: 54px; height: 54px; font-size: 28px; }
+      .pickup-card > :last-child { grid-column: 2; }
+      .partner-summary { gap: 6px; }
+      .mini-stat { padding: 8px; }
+      .mini-stat strong { font-size: 17px; }
+      .mini-stat small { font-size: 8px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .panel { padding: 16px; }
+      .footer { flex-direction: column; }
+      .reserve-row { align-items: stretch; flex-direction: column; }
+      .reserve-row .primary-button { width: 100%; }
+      .verify-form { width: 100%; }
+      .verify-input { flex: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Crumb Club home" data-view="browse">
+        <span class="brand-mark" aria-hidden="true">🥐</span>
+        <span class="brand-name">crumb club<small>campus food rescue</small></span>
+      </a>
+      <nav class="nav" aria-label="Main navigation">
+        <button class="nav-button active" data-view="browse">Snack shelf</button>
+        <button class="nav-button" data-view="pickups">My pickups <span id="pickupBadge" class="nav-count" hidden>0</span></button>
+        <button class="nav-button" data-view="partner">Partner board</button>
+        <button class="reset-button" id="resetButton" type="button" aria-label="Reset demo data">↻ Reset demo</button>
+      </nav>
+    </header>
+
+    <section class="hero" id="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="dot"></span> Tiny food rescue club</p>
+        <h1>Good food deserves a <em>second yes.</em></h1>
+        <p>Last-call campus bites, saved by your neighbours. Find a little snack, claim a portion, and pick it up before the window closes.</p>
+        <button class="primary-button" data-view="browse" type="button">See what's up for grabs <span aria-hidden="true">↗</span></button>
+        <div class="hero-tags"><span>local pickup</span><span>no delivery fuss</span><span>sample demo offers</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <span class="tiny-star star-one">✳</span>
+        <span class="tiny-star star-two">✦</span>
+        <div class="sunburst"></div>
+        <div class="plate"><span class="plate-food">🥪</span></div>
+        <div class="sticker">A LITTLE<br><strong>YUM</strong> GOES FAR</div>
+      </div>
+    </section>
+
+    <section class="stats-strip" aria-label="Crumb Club stats">
+      <div class="stat"><span class="stat-icon" aria-hidden="true">🍱</span><span><strong id="availableStat">0</strong><small>portions up for grabs</small></span></div>
+      <div class="stat"><span class="stat-icon" aria-hidden="true">⏰</span><span><strong id="dropsStat">0</strong><small>little drops today</small></span></div>
+      <div class="stat"><span class="stat-icon" aria-hidden="true">💚</span><span><strong id="rescuedStat">0</strong><small>portions picked up</small></span></div>
+    </section>
+
+    <main>
+      <section id="browseView">
+        <div class="section-heading">
+          <div><p class="section-kicker">01 / the snack shelf</p><h2>Today's little food rescues</h2></div>
+          <p class="section-note" id="dropCount">Fresh offers from around campus</p>
+        </div>
+        <div class="controls">
+          <label class="search-wrap"><span aria-hidden="true">🔎</span><input class="search-input" id="searchInput" type="search" placeholder="Search snacks or spots..." aria-label="Search snacks or spots"></label>
+          <label><span class="sr-only" style="position:absolute;left:-9999px">Filter offers</span>
+            <select class="select-input" id="filterSelect" aria-label="Filter offers">
+              <option value="all">All little drops</option>
+              <option value="veg">Vegetarian</option>
+              <option value="vegan">Vegan</option>
+              <option value="free">Free snacks</option>
+              <option value="ending">Ending soon</option>
+            </select>
+          </label>
+        </div>
+        <div class="drop-grid" id="dropGrid" aria-live="polite"></div>
+        <p class="helper-note">Tiny note: offers and pickups here are sample demo data stored in this browser. Ask the food partner about ingredients or allergens before collecting.</p>
+      </section>
+
+      <section class="subpage" id="pickupsView" hidden>
+        <div class="subpage-head">
+          <div><p class="section-kicker">02 / your snack stash</p><h2>My pickups</h2></div>
+          <p>Your reserved portions and pickup codes live here. Show the code to the food partner when you arrive.</p>
+        </div>
+        <div class="pickup-list" id="pickupList"></div>
+      </section>
+
+      <section class="subpage" id="partnerView" hidden>
+        <div class="subpage-head">
+          <div><p class="section-kicker">03 / the counter side</p><h2>Partner board</h2></div>
+          <p>Post what's left, set a pickup window, and verify each pickup with its little code.</p>
+        </div>
+        <div class="partner-layout">
+          <section class="panel" aria-labelledby="postHeading">
+            <h3 id="postHeading">Post a Crumb Drop ✨</h3>
+            <p class="panel-intro">A few details help neighbours find and collect your extra food.</p>
+            <form id="dropForm">
+              <div class="form-grid">
+                <div class="field full"><label for="foodName">Food name</label><input class="field-input" id="foodName" name="foodName" maxlength="60" placeholder="e.g. Veg puff duo" required></div>
+                <div class="field"><label for="providerName">Cafe / group</label><input class="field-input" id="providerName" name="providerName" maxlength="45" placeholder="e.g. Main canteen" required></div>
+                <div class="field"><label for="location">Pickup spot</label><input class="field-input" id="location" name="location" maxlength="60" placeholder="e.g. Student Centre counter" required></div>
+                <div class="field full"><label for="description">A tiny description</label><textarea class="field-textarea" id="description" name="description" maxlength="180" placeholder="What should a hungry neighbour know?"></textarea></div>
+                <div class="field"><label for="quantity">Portions</label><input class="field-input" id="quantity" name="quantity" type="number" min="1" max="100" value="4" required></div>
+                <div class="field"><label for="price">Price per portion (₹)</label><input class="field-input" id="price" name="price" type="number" min="0" max="10000" step="1" value="0" required></div>
+                <div class="field"><label for="pickupStart">Pickup starts</label><input class="field-input" id="pickupStart" name="pickupStart" type="datetime-local" required></div>
+                <div class="field"><label for="pickupEnd">Pickup ends</label><input class="field-input" id="pickupEnd" name="pickupEnd" type="datetime-local" required></div>
+                <div class="field"><label for="dietary">Food tag</label><select class="field-select" id="dietary" name="dietary"><option>Vegetarian</option><option>Vegan</option><option>Contains meat</option><option>Not specified</option></select></div>
+                <div class="field"><label for="foodEmoji">Snack doodle</label><select class="field-select" id="foodEmoji" name="foodEmoji"><option>🥪</option><option>🥟</option><option>🥐</option><option>🍕</option><option>🍌</option><option>🍰</option><option>🥗</option><option>🍪</option></select></div>
+                <div class="field full"><label for="allergens">Allergen / ingredient note</label><input class="field-input" id="allergens" name="allergens" maxlength="120" placeholder="e.g. Contains wheat and milk; ask us about other ingredients"></div>
+              </div>
+              <button class="primary-button drop-submit" type="submit">Post this little drop <span aria-hidden="true">✦</span></button>
+            </form>
+          </section>
+          <section class="panel" aria-labelledby="manageHeading">
+            <h3 id="manageHeading">Your counter today</h3>
+            <p class="panel-intro">Reservations update as neighbours claim portions.</p>
+            <div class="partner-summary">
+              <div class="mini-stat"><strong id="partnerDropStat">0</strong><small>open drops</small></div>
+              <div class="mini-stat"><strong id="partnerPortionStat">0</strong><small>portions left</small></div>
+              <div class="mini-stat"><strong id="partnerCollectedStat">0</strong><small>picked up</small></div>
+            </div>
+            <div class="partner-list" id="partnerList"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><span><strong>crumb club</strong> · a tiny demo for less waste and more yum</span><span>Sample data stays in this browser · no payments or delivery</span></footer>
+  </div>
+
+  <dialog class="dialog" id="dropDialog" aria-labelledby="dialogTitle">
+    <div class="dialog-inner" id="dialogContent"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+      const STORAGE_KEY = "crumb-club-demo-v1";
+      const toneList = ["tone-pink", "tone-yellow", "tone-blue", "tone-green", "tone-orange"];
+      const now = Date.now();
+
+      function inMinutes(minutes) { return new Date(Date.now() + minutes * 60000).toISOString(); }
+      function makeSeedState() {
+        return {
+          drops: [
+            { id: "seed-puff", name: "Masala veg puff duo", provider: "Nimbu & Co.", location: "Student Centre · counter 2", description: "Two flaky puffs, packed up and ready for a happy walk home.", quantity: 7, remaining: 7, price: 15, dietary: "Vegetarian", emoji: "🥟", allergens: "Contains wheat. Ask the partner about other ingredients.", startAt: inMinutes(-12), endAt: inMinutes(72), status: "active", createdAt: new Date().toISOString() },
+            { id: "seed-rolls", name: "Last-bake cinnamon rolls", provider: "The Oven Club", location: "Library cafe · side window", description: "Soft, swirly rolls from today's final tray. A little icing on top.", quantity: 4, remaining: 4, price: 25, dietary: "Vegetarian", emoji: "🥐", allergens: "Contains wheat and milk. Ask the partner about other ingredients.", startAt: inMinutes(-5), endAt: inMinutes(108), status: "active", createdAt: new Date().toISOString() },
+            { id: "seed-fruit", name: "Bright little fruit cups", provider: "Robotics Society", location: "Innovation Block · lobby", description: "Fresh fruit cups left after the club meetup. Grab one before they go.", quantity: 6, remaining: 6, price: 0, dietary: "Vegan", emoji: "🍓", allergens: "Ingredients listed by the provider; please check at pickup.", startAt: inMinutes(-2), endAt: inMinutes(145), status: "active", createdAt: new Date().toISOString() }
+          ],
+          claims: []
+        };
+      }
+
+      function loadState() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (!saved) return makeSeedState();
+          const parsed = JSON.parse(saved);
+          if (!Array.isArray(parsed.drops) || !Array.isArray(parsed.claims)) return makeSeedState();
+          return parsed;
+        } catch (error) {
+          return makeSeedState();
+        }
+      }
+
+      let state = loadState();
+      let toastTimer = 0;
+      const $ = function (selector, root) { return (root || document).querySelector(selector); };
+      const $$ = function (selector, root) { return Array.from((root || document).querySelectorAll(selector)); };
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (error) {
+          showToast("This browser couldn't save the demo data.");
+        }
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function getDrop(id) { return state.drops.find(function (drop) { return drop.id === id; }); }
+      function isOpen(drop) { return drop.status === "active" && Number(drop.remaining) > 0 && new Date(drop.startAt).getTime() <= Date.now() && new Date(drop.endAt).getTime() > Date.now(); }
+      function formatTime(value) {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "Time to be confirmed";
+        return new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(date);
+      }
+      function formatWindow(drop) { return formatTime(drop.startAt) + "–" + formatTime(drop.endAt); }
+      function timeLeft(value) {
+        const mins = Math.max(0, Math.ceil((new Date(value).getTime() - Date.now()) / 60000));
+        if (mins <= 0) return "Pickup window ended";
+        if (mins < 60) return "Closes in about " + mins + " min";
+        const hrs = Math.floor(mins / 60);
+        const rest = mins % 60;
+        return "Closes in about " + hrs + "h" + (rest ? " " + rest + "m" : "");
+      }
+      function priceLabel(price) { return Number(price) === 0 ? "FREE" : "₹" + Number(price) + " / portion"; }
+      function findDropClaims(dropId) { return state.claims.filter(function (claim) { return claim.dropId === dropId; }); }
+      function countCollected() {
+        return state.claims.filter(function (claim) { return claim.status === "collected"; }).reduce(function (sum, claim) { return sum + Number(claim.quantity || 0); }, 0);
+      }
+
+      function expireClaims() {
+        let changed = false;
+        state.claims.forEach(function (claim) {
+          const drop = getDrop(claim.dropId);
+          if (claim.status === "reserved" && drop && new Date(drop.endAt).getTime() <= Date.now()) {
+            claim.status = "expired";
+            changed = true;
+          }
+        });
+        if (changed) saveState();
+      }
+
+      function showToast(message) {
+        const toast = $("#toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(function () { toast.classList.remove("show"); }, 2800);
+      }
+
+      function renderStats() {
+        const openDrops = state.drops.filter(isOpen);
+        const available = openDrops.reduce(function (sum, drop) { return sum + Number(drop.remaining); }, 0);
+        $("#availableStat").textContent = String(available);
+        $("#dropsStat").textContent = String(openDrops.length);
+        $("#rescuedStat").textContent = String(countCollected());
+        const activeClaims = state.claims.filter(function (claim) { return claim.status === "reserved"; }).length;
+        const badge = $("#pickupBadge");
+        badge.textContent = String(activeClaims);
+        badge.hidden = activeClaims === 0;
+        $("#partnerDropStat").textContent = String(openDrops.length);
+        $("#partnerPortionStat").textContent = String(available);
+        $("#partnerCollectedStat").textContent = String(countCollected());
+      }
+
+      function renderDropCard(drop, index) {
+        const remaining = Number(drop.remaining);
+        const scarcity = remaining <= 2 ? "LAST FEW!" : "UP FOR GRABS";
+        const leftCopy = remaining === 1 ? "1 portion left" : remaining + " portions left";
+        const dietary = drop.dietary && drop.dietary !== "Not specified" ? '<span class="chip">' + escapeHtml(drop.dietary) + "</span>" : "";
+        return '<article class="drop-card">' +
+          '<div class="card-banner ' + toneList[index % toneList.length] + '">' +
+            '<span class="food-emoji" aria-hidden="true">' + escapeHtml(drop.emoji || "🍽️") + "</span>" +
+            '<span class="save-tag">' + scarcity + "</span>" +
+          "</div>" +
+          '<div class="card-body">' +
+            '<div class="vendor-row"><span>' + escapeHtml(drop.provider) + '</span><span class="portion-left">' + escapeHtml(leftCopy) + "</span></div>" +
+            "<h3>" + escapeHtml(drop.name) + "</h3>" +
+            '<p class="drop-description">' + escapeHtml(drop.description || "A little campus treat, ready for pickup.") + "</p>" +
+            '<div class="chip-row">' + dietary + '<span class="chip price-chip">' + escapeHtml(priceLabel(drop.price)) + "</span></div>" +
+            '<div class="card-meta"><span>📍 ' + escapeHtml(drop.location) + '</span><span>⏰ ' + escapeHtml(formatWindow(drop)) + " · " + escapeHtml(timeLeft(drop.endAt)) + "</span></div>" +
+            '<button class="card-action" type="button" data-action="open-drop" data-drop-id="' + escapeHtml(drop.id) + '">Save me a snack <span aria-hidden="true">↗</span></button>' +
+          "</div>" +
+        "</article>";
+      }
+
+      function renderBrowse() {
+        const search = ($("#searchInput").value || "").trim().toLowerCase();
+        const filter = $("#filterSelect").value;
+        let results = state.drops.filter(isOpen);
+        if (search) results = results.filter(function (drop) {
+          return [drop.name, drop.provider, drop.location, drop.description, drop.dietary].join(" ").toLowerCase().includes(search);
+        });
+        if (filter === "veg") results = results.filter(function (drop) { return drop.dietary === "Vegetarian"; });
+        if (filter === "vegan") results = results.filter(function (drop) { return drop.dietary === "Vegan"; });
+        if (filter === "free") results = results.filter(function (drop) { return Number(drop.price) === 0; });
+        if (filter === "ending") results = results.filter(function (drop) { return (new Date(drop.endAt).getTime() - Date.now()) <= 60 * 60000; });
+        $("#dropCount").textContent = results.length + (results.length === 1 ? " tiny drop to explore" : " tiny drops to explore");
+        const grid = $("#dropGrid");
+        if (!results.length) {
+          grid.innerHTML = '<div class="empty-state"><span class="empty-emoji" aria-hidden="true">🫙</span><h3>No crumbs in this corner yet</h3><p>Try another filter or check back when a fresh drop appears.</p></div>';
+          return;
+        }
+        grid.innerHTML = results.map(renderDropCard).join("");
+      }
+
+      function statusLabel(status) {
+        if (status === "collected") return "Picked up";
+        if (status === "expired") return "Window ended";
+        if (status === "cancelled") return "Cancelled";
+        return "Ready to collect";
+      }
+
+      function renderPickups() {
+        const list = $("#pickupList");
+        const claims = state.claims.slice().sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+        if (!claims.length) {
+          list.innerHTML = '<div class="empty-state"><span class="empty-emoji" aria-hidden="true">🧺</span><h3>Your snack bag is empty</h3><p>Find a little drop on the snack shelf and reserve a portion.</p><br><button class="soft-button" data-view="browse" type="button">Browse the snack shelf ↗</button></div>';
+          return;
+        }
+        list.innerHTML = claims.map(function (claim) {
+          const drop = getDrop(claim.dropId);
+          if (!drop) return "";
+          const status = claim.status || "reserved";
+          const codeBlock = status === "reserved" ? '<span class="pickup-code">' + escapeHtml(claim.code) + "</span>" : "";
+          const cancel = status === "reserved" ? '<button class="soft-button" type="button" data-action="cancel-claim" data-claim-id="' + escapeHtml(claim.id) + '">Cancel pickup</button>' : "";
+          return '<article class="pickup-card">' +
+            '<div class="pickup-icon" aria-hidden="true">' + escapeHtml(drop.emoji || "🍽️") + "</div>" +
+            '<div><span class="status-pill ' + (status === "collected" ? "collected" : status === "expired" || status === "cancelled" ? status : "") + '">' + escapeHtml(statusLabel(status)) + "</span>" +
+            "<h3>" + escapeHtml(drop.name) + "</h3>" +
+            "<p>" + escapeHtml(drop.provider) + " · " + escapeHtml(drop.location) + "<br>" + escapeHtml(claim.quantity) + " portion(s) · pickup " + escapeHtml(formatWindow(drop)) + "</p>" +
+            (codeBlock ? "<div><small>Show this code at the counter:</small><br>" + codeBlock + "</div>" : "") +
+            "</div><div>" + cancel + "</div>" +
+          "</article>";
+        }).join("");
+      }
+
+      function renderPartner() {
+        const list = $("#partnerList");
+        const drops = state.drops.slice().sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+        if (!drops.length) {
+          list.innerHTML = '<div class="empty-state"><span class="empty-emoji" aria-hidden="true">🪄</span><h3>Your counter is ready</h3><p>Post your first little drop to get started.</p></div>';
+          return;
+        }
+        list.innerHTML = drops.map(function (drop) {
+          const claims = findDropClaims(drop.id);
+          const open = isOpen(drop);
+          const upcoming = drop.status === "active" && new Date(drop.startAt).getTime() > Date.now() && new Date(drop.endAt).getTime() > Date.now();
+          const claimHtml = claims.length ? claims.map(function (claim) {
+            if (claim.status === "reserved") {
+              return '<div class="claim-row"><span class="claim-person">' + escapeHtml(claim.quantity) + " portion(s) · code " + escapeHtml(claim.code) + '</span><form class="verify-form" data-claim-id="' + escapeHtml(claim.id) + '"><label class="sr-only" style="position:absolute;left:-9999px" for="code-' + escapeHtml(claim.id) + '">Pickup code</label><input class="verify-input" id="code-' + escapeHtml(claim.id) + '" name="code" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="4 digits" required><button class="verify-button" type="submit">Verify pickup</button></form></div>';
+            }
+            return '<div class="claim-row"><span class="claim-person">' + escapeHtml(claim.quantity) + " portion(s) · " + escapeHtml(statusLabel(claim.status)) + "</span></div>";
+          }).join("") : '<div class="claim-row"><span class="claim-person" style="color:#7b8074">No reservations yet — waiting for a hungry neighbour.</span></div>';
+          return '<article class="partner-drop">' +
+            '<div class="partner-drop-head"><div><h4>' + escapeHtml(drop.emoji || "🍽️") + " " + escapeHtml(drop.name) + "</h4><p>" + escapeHtml(drop.location) + " · " + escapeHtml(formatWindow(drop)) + "</p></div>" +
+            '<span class="drop-count">' + escapeHtml(drop.remaining) + " / " + escapeHtml(drop.quantity) + " left</span></div>" +
+            (open ? '<button class="soft-button" type="button" data-action="close-drop" data-drop-id="' + escapeHtml(drop.id) + '">Close drop</button>' : upcoming ? '<span class="status-pill scheduled">Opens at ' + escapeHtml(formatTime(drop.startAt)) + '</span>' : '<span class="status-pill expired">Closed</span>') +
+            claimHtml +
+          "</article>";
+        }).join("");
+      }
+
+      function renderAll() {
+        expireClaims();
+        renderStats();
+        renderBrowse();
+        renderPickups();
+        renderPartner();
+      }
+
+      function switchView(view) {
+        const views = { browse: $("#browseView"), pickups: $("#pickupsView"), partner: $("#partnerView") };
+        Object.keys(views).forEach(function (key) { views[key].hidden = key !== view; });
+        $("#hero").hidden = view !== "browse";
+        $$(".nav-button").forEach(function (button) { button.classList.toggle("active", button.dataset.view === view); });
+        window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      }
+
+      function openDrop(id) {
+        const drop = getDrop(id);
+        if (!drop || !isOpen(drop)) { showToast("That little drop has just closed."); renderAll(); return; }
+        const content = $("#dialogContent");
+        content.innerHTML =
+          '<div class="dialog-top"><div><div class="dialog-food" aria-hidden="true">' + escapeHtml(drop.emoji || "🍽️") + "</div><p class=\"section-kicker\">A little food rescue</p><h2 id=\"dialogTitle\">" + escapeHtml(drop.name) + "</h2></div><button class=\"close-dialog\" type=\"button\" data-action=\"close-dialog\" aria-label=\"Close details\">×</button></div>" +
+          '<p class="dialog-description">' + escapeHtml(drop.description || "A little campus treat, ready for pickup.") + "</p>" +
+          '<div class="dialog-info"><span>🏠 ' + escapeHtml(drop.provider) + " · " + escapeHtml(drop.location) + "</span><span>⏰ Pickup " + escapeHtml(formatWindow(drop)) + " (" + escapeHtml(timeLeft(drop.endAt)) + ")</span><span>🍽️ " + escapeHtml(drop.dietary || "Food tag not specified") + " · " + escapeHtml(drop.allergens || "Ask the partner about ingredients.") + "</span><span>💛 " + escapeHtml(drop.remaining) + " portion(s) left · " + escapeHtml(priceLabel(drop.price)) + "</span></div>" +
+          '<form id="reserveForm" data-drop-id="' + escapeHtml(drop.id) + '"><div class="reserve-row"><div class="field"><label for="reserveQuantity">How many portions?</label><input class="field-input" id="reserveQuantity" name="quantity" type="number" min="1" max="' + escapeHtml(drop.remaining) + '" value="1" required></div><button class="primary-button" type="submit">Reserve a spot ✦</button></div></form>' +
+          '<p class="dialog-note">Your pickup code appears under “My pickups.” Ask the partner about ingredients if you have an allergy.</p>';
+        $("#dropDialog").showModal();
+      }
+
+      function localInputTime(date) {
+        const adjusted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        return adjusted.toISOString().slice(0, 16);
+      }
+      function setDefaultTimes() {
+        const start = new Date(Date.now() - 60000);
+        const end = new Date(Date.now() + 95 * 60000);
+        $("#pickupStart").value = localInputTime(start);
+        $("#pickupEnd").value = localInputTime(end);
+      }
+
+      document.addEventListener("click", function (event) {
+        const target = event.target instanceof Element ? event.target : null;
+        if (!target) return;
+        const viewButton = target.closest("[data-view]");
+        if (viewButton) {
+          event.preventDefault();
+          switchView(viewButton.dataset.view);
+          return;
+        }
+        const actionButton = target.closest("[data-action]");
+        if (!actionButton) return;
+        const action = actionButton.dataset.action;
+        if (action === "open-drop") openDrop(actionButton.dataset.dropId);
+        if (action === "close-dialog") $("#dropDialog").close();
+        if (action === "cancel-claim") {
+          const claim = state.claims.find(function (item) { return item.id === actionButton.dataset.claimId; });
+          if (!claim || claim.status !== "reserved") return;
+          const drop = getDrop(claim.dropId);
+          claim.status = "cancelled";
+          if (drop && new Date(drop.endAt).getTime() > Date.now()) drop.remaining = Number(drop.remaining) + Number(claim.quantity);
+          saveState();
+          renderAll();
+          showToast("Pickup cancelled. Those portions are back on the shelf.");
+        }
+        if (action === "close-drop") {
+          const drop = getDrop(actionButton.dataset.dropId);
+          if (drop) { drop.status = "closed"; saveState(); renderAll(); showToast("This drop is closed to new reservations."); }
+        }
+      });
+
+      document.addEventListener("submit", function (event) {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        event.preventDefault();
+
+        if (form.id === "dropForm") {
+          const data = new FormData(form);
+          const name = String(data.get("foodName") || "").trim();
+          const provider = String(data.get("providerName") || "").trim();
+          const location = String(data.get("location") || "").trim();
+          const quantity = Number(data.get("quantity"));
+          const price = Number(data.get("price"));
+          const startAt = new Date(String(data.get("pickupStart") || ""));
+          const endAt = new Date(String(data.get("pickupEnd") || ""));
+          if (!name || !provider || !location || !Number.isInteger(quantity) || quantity < 1 || quantity > 100 || price < 0 || Number.isNaN(price)) {
+            showToast("Check the food, portion count, and price, then try again.");
+            return;
+          }
+          if (Number.isNaN(startAt.getTime()) || Number.isNaN(endAt.getTime()) || endAt <= startAt || endAt <= new Date()) {
+            showToast("Choose a pickup window that ends in the future.");
+            return;
+          }
+          state.drops.unshift({
+            id: "drop-" + Math.random().toString(36).slice(2, 9),
+            name: name,
+            provider: provider,
+            location: location,
+            description: String(data.get("description") || "").trim(),
+            quantity: quantity,
+            remaining: quantity,
+            price: price,
+            dietary: String(data.get("dietary") || "Not specified"),
+            emoji: String(data.get("foodEmoji") || "🍽️"),
+            allergens: String(data.get("allergens") || "Ask the partner about ingredients."),
+            startAt: startAt.toISOString(),
+            endAt: endAt.toISOString(),
+            status: "active",
+            createdAt: new Date().toISOString()
+          });
+          saveState();
+          renderAll();
+          form.reset();
+          $("#quantity").value = "4";
+          $("#price").value = "0";
+          setDefaultTimes();
+          showToast("Your little drop is on the snack shelf!");
+          return;
+        }
+
+        if (form.id === "reserveForm") {
+          const drop = getDrop(form.dataset.dropId);
+          const quantity = Number(new FormData(form).get("quantity"));
+          if (!drop || !isOpen(drop)) { $("#dropDialog").close(); showToast("That drop just closed. Have a peek at the shelf."); renderAll(); return; }
+          if (!Number.isInteger(quantity) || quantity < 1 || quantity > Number(drop.remaining)) {
+            showToast("There aren't that many portions left. Try a smaller number.");
+            return;
+          }
+          drop.remaining = Number(drop.remaining) - quantity;
+          state.claims.unshift({
+            id: "claim-" + Math.random().toString(36).slice(2, 10),
+            dropId: drop.id,
+            quantity: quantity,
+            code: String(Math.floor(1000 + Math.random() * 9000)),
+            status: "reserved",
+            createdAt: new Date().toISOString()
+          });
+          saveState();
+          $("#dropDialog").close();
+          renderAll();
+          showToast("Reserved! Your pickup code is waiting in My pickups.");
+          return;
+        }
+
+        if (form.classList.contains("verify-form")) {
+          const claim = state.claims.find(function (item) { return item.id === form.dataset.claimId; });
+          const code = String(new FormData(form).get("code") || "").trim();
+          if (!claim || claim.status !== "reserved") { showToast("That pickup is no longer waiting for confirmation."); return; }
+          if (code !== claim.code) { showToast("That code doesn't match. Check the student's pickup screen."); return; }
+          claim.status = "collected";
+          claim.collectedAt = new Date().toISOString();
+          saveState();
+          renderAll();
+          showToast("Pickup confirmed — one less portion goes to waste!");
+        }
+      });
+
+      $("#searchInput").addEventListener("input", renderBrowse);
+      $("#filterSelect").addEventListener("change", renderBrowse);
+      $("#resetButton").addEventListener("click", function () {
+        state = makeSeedState();
+        saveState();
+        $("#searchInput").value = "";
+        $("#filterSelect").value = "all";
+        renderAll();
+        showToast("Demo reset. Fresh sample drops are back!");
+      });
+
+      setDefaultTimes();
+      renderAll();
+      window.setInterval(function () { renderAll(); }, 30000);
+    })();
+  </script>
+</body>
+</html>
